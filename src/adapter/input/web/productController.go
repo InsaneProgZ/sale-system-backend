@@ -1,11 +1,11 @@
-package webs
+package web
 
 import (
 	"encoding/json"
 	"net/http"
 	"sale-system/src/adapter/input/web/request"
-	"sale-system/src/application/service"
 	"sale-system/src/application/handler"
+	"sale-system/src/application/service"
 )
 
 func Application() {
@@ -18,8 +18,8 @@ func productController(writer http.ResponseWriter, httpRequest *http.Request) {
 	case "POST":
 		{
 			var productRequest request.Product
+
 			err := json.NewDecoder(httpRequest.Body).Decode(&productRequest)
-			
 			handler.ErrorHandler(err)
 
 			product := productRequest.ToDomain()
@@ -27,9 +27,8 @@ func productController(writer http.ResponseWriter, httpRequest *http.Request) {
 			productResponse := service.CreateProduct(product).ToResponse()
 
 			responseBody, err := json.Marshal(productResponse)
-
 			handler.ErrorHandler(err)
-			
+
 			writer.Header().Set("Content-Type", "application/json")
 			writer.WriteHeader(http.StatusCreated)
 			writer.Write(responseBody)
