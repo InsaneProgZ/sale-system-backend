@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"go/printer"
 )
 
 var ErrorHandler = func(err any) {
