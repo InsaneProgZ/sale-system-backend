@@ -20,8 +20,6 @@ func ConnectSQL() (*sql.DB, error) {
 	if err != nil {
 		panic(err)
 	}
-	err = d.Ping()
-	fmt.Println( err)
 	DB = d
 	return DB, err
 }
