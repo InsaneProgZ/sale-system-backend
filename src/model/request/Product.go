@@ -1,8 +1,7 @@
 package request
 
 import (
-	"sale-system/src/application/domain"
-
+	"sale-system/src/model/domain"
 	"github.com/google/uuid"
 )
 

@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"sale-system/src/adapter/input/web/response"
+	"sale-system/src/model/response"
 
 	"github.com/google/uuid"
 )

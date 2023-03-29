@@ -1,7 +1,11 @@
 package main
 
-import "sale-system/src/adapter/input/web"
+import (
+	"sale-system/src/repository"
+	"sale-system/src/router"
+)
 
 func main() {
-	web.Application()
+	repository.ConnectSQL()
+	router.Router()
 }
