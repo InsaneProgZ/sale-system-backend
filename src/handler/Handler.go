@@ -34,6 +34,10 @@ func Handler(writer http.ResponseWriter, httpRequest *http.Request) {
 			writer.WriteHeader(http.StatusCreated)
 			writer.Write(responseBody)
 		}
+		case "GET":
+		{
+			service.FindAllProducts()
+		}
 	default:
 		http.Error(writer, "Not Found", http.StatusNotFound)
 

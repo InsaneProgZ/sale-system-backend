@@ -18,3 +18,7 @@ func CreateProduct(product domain.Product) *domain.Product {
 
 	return &product
 }
+
+func FindAllProducts(){
+	repository.FindAll()
+}
