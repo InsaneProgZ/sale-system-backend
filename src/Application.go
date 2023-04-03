@@ -7,5 +7,6 @@ import (
 
 func main() {
 	repository.ConnectSQL()
+	defer repository.DB.Close()
 	router.Router()
 }

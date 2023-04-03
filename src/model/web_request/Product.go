@@ -1,8 +1,8 @@
-package request
+package web_request
 
 import (
 	"sale-system/src/model/domain"
-	"github.com/google/uuid"
+	"time"
 )
 
 type Product struct {
@@ -14,10 +14,10 @@ type Product struct {
 
 func (product Product) ToDomain() domain.Product {
 	return domain.Product{
-		Name:      product.Name,
-		BuyValue:  product.BuyValue,
-		SellValue: product.SellValue,
-		Brand:     product.Brand,
-		Code:      uuid.UUID{},
+		Name:          product.Name,
+		BuyValue:      product.BuyValue,
+		SellValue:     product.SellValue,
+		Brand:         product.Brand,
+		Creation_date: time.Now().UTC(),
 	}
 }
