@@ -15,3 +15,7 @@ func CreateProduct(product domain.Product) domain.Product {
 func FindAllProducts() []domain.Product{
 	return repository.FindAll()
 }
+
+func FindProductById(id int64) domain.Product{
+	return repository.FindById(id)
+}

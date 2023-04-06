@@ -3,13 +3,11 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var DB *sql.DB
-var err error
-
-func ConnectSQL() (*sql.DB, error) {
+func ConnectDB() *sql.DB {
 	dbSource := fmt.Sprintf(
 		"yan:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true",
 		"yan",
@@ -17,9 +15,9 @@ func ConnectSQL() (*sql.DB, error) {
 		"3306",
 		"sale-system",
 	)
-	DB, err = sql.Open("mysql", dbSource)
+	ConnectionDB, err := sql.Open("mysql", dbSource)
 	if err != nil {
 		panic(err)
 	}
-	return DB, err
+	return ConnectionDB
 }

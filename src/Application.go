@@ -1,12 +1,25 @@
 package main
 
 import (
+	"net/http"
+	"sale-system/src/controller"
 	"sale-system/src/repository"
-	"sale-system/src/router"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
-	repository.ConnectSQL()
-	defer repository.DB.Close()
-	router.Router()
+	router := mux.NewRouter()
+
+	repository.ConnectDB()
+
+	registerProductRouter(router)
+
+	http.ListenAndServe("localhost:8080", router)
+}
+
+func registerProductRouter(router *mux.Router) {
+	router.HandleFunc("/products", controller.CreateProduct).Methods("POST")
+	router.HandleFunc("/products", controller.FindAllProducts).Methods("GET")
+	router.HandleFunc("/products/{code}", controller.FindProductById).Methods("GET")
 }
