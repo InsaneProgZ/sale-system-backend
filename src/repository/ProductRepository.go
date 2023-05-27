@@ -7,12 +7,12 @@ import (
 
 func Save(product domain.Product) (code int64) {
 	ConnectionDB := ConnectDB()
-	sql := `INSERT into products (code, name, buy_value , sell_value, brand, creation_date) values (null, ? , ? , ?, ?, ?);`
+	sql := `INSERT into products (code, name, buy_price , sell_price, brand, creation_date) values (null, ? , ? , ?, ?, ?);`
 	queryResult, err := ConnectionDB.Exec(
 		sql,
 		product.Name,
-		product.BuyValue,
-		product.SellValue,
+		product.BuyPrice,
+		product.SellPrice,
 		product.Brand,
 		product.Creation_date)
 	if err != nil {
@@ -39,14 +39,14 @@ func FindAll() []domain.Product {
 	for queryResult.Next() {
 		product := domain.Product{}
 
-		queryResult.Scan(&product.Code, &product.Name, &product.BuyValue, &product.SellValue, &product.Brand, &product.Creation_date)
+		queryResult.Scan(&product.Code, &product.Name, &product.BuyPrice, &product.SellPrice, &product.Brand, &product.Creation_date)
 		product.Creation_date = product.Creation_date.In(time.Local)
 		products = append(products, product)
 		println(product.Code,
 			product.Name,
 			product.Brand,
-			product.BuyValue,
-			product.SellValue,
+			product.BuyPrice,
+			product.SellPrice,
 			product.Creation_date.Format("Monday, 02-Jan-06 15:04:05 MST"))
 	}
 	return products
@@ -59,8 +59,8 @@ func FindById(id int64) domain.Product {
 	defer ConnectionDB.Close()
 
 	product := domain.Product{}
-	queryResult.Scan(&product.Code, &product.Name, &product.BuyValue, &product.SellValue, &product.Brand, &product.Creation_date)
+	queryResult.Scan(&product.Code, &product.Name, &product.BuyPrice, &product.SellPrice, &product.Brand, &product.Creation_date)
 	product.Creation_date = product.Creation_date.In(time.Local)
-	// println(product.Code, product.Name, product.BuyValue, product.SellValue, product.Brand, product.Creation_date.String())
+	// println(product.Code, product.Name, product.BuyPrice, product.SellPrice, product.Brand, product.Creation_date.String())
 	return product
 }

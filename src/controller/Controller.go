@@ -27,8 +27,11 @@ func CreateProduct(writer http.ResponseWriter, httpRequest *http.Request) {
 	}
 
 	writer.Header().Set("Content-Type", "application/json")
+	writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+	writer.Header().Set("Access-Control-Allow-Headers", "content-type")
 	writer.WriteHeader(http.StatusCreated)
 	writer.Write(responseBody)
+	println(string(responseBody))
 }
 
 func FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request) {
@@ -39,6 +42,7 @@ func FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request) {
 		panic(err)
 	}
 	writer.Header().Set("Content-Type", "application/json")
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
 	writer.WriteHeader(http.StatusOK)
 	writer.Write(responseBody)
 
@@ -59,4 +63,9 @@ func FindProductById(writer http.ResponseWriter, httpRequest *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
 	writer.Write(responseBody)
+}
+
+func OptionsForBrowsers(writer http.ResponseWriter, httpRequest *http.Request) {
+	writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+	writer.Header().Set("Access-Control-Allow-Headers", "content-type")
 }

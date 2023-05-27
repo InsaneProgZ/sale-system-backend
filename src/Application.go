@@ -19,7 +19,8 @@ func main() {
 }
 
 func registerProductRouter(router *mux.Router) {
-	router.HandleFunc("/products", controller.CreateProduct).Methods("POST")
+	router.HandleFunc("/products", controller.OptionsForBrowsers).Methods("OPTIONS")
 	router.HandleFunc("/products", controller.FindAllProducts).Methods("GET")
+	router.HandleFunc("/products", controller.CreateProduct).Methods("POST")
 	router.HandleFunc("/products/{code}", controller.FindProductById).Methods("GET")
 }
