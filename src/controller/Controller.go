@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"sale-system/src/model/domain"
 	"sale-system/src/model/web_request"
 	"sale-system/src/service"
 	"strconv"
@@ -37,7 +38,7 @@ func CreateProduct(writer http.ResponseWriter, httpRequest *http.Request) {
 func FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request) {
 
 	products := service.FindAllProducts()
-	responseBody, err := json.Marshal(products)
+	responseBody, err := json.Marshal(domain.ProductsDomainToProductsResponse(products))
 	if err != nil {
 		panic(err)
 	}
