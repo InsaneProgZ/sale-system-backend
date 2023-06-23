@@ -5,17 +5,26 @@ import (
 	"sale-system/src/repository"
 )
 
-func CreateProduct(product domain.Product) domain.Product {
+type ProductService interface {
+	CreateProduct(product domain.Product) domain.Product
+	FindAllProducts() []domain.Product
+	FindProductById(id int64) domain.Product
+}
 
-	product.Code = repository.Save(product)
+type ProductServiceImpl struct {
+	Database repository.Database
+}
 
+func (productService *ProductServiceImpl) CreateProduct(product domain.Product) domain.Product {
+
+	product.Code = productService.Database.Save(product)
 	return product
 }
 
-func FindAllProducts() []domain.Product{
-	return repository.FindAll()
+func (productService *ProductServiceImpl) FindAllProducts() []domain.Product {
+	return productService.Database.FindAll()
 }
 
-func FindProductById(id int64) domain.Product{
-	return repository.FindById(id)
+func (productService *ProductServiceImpl) FindProductById(id int64) domain.Product {
+	return productService.Database.FindById(id)
 }

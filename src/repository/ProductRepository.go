@@ -1,11 +1,22 @@
 package repository
 
 import (
+	"database/sql"
 	"sale-system/src/model/domain"
 	"time"
 )
 
-func Save(product domain.Product) (code int64) {
+type Database interface {
+	Save(product domain.Product) int64
+	FindAll() []domain.Product
+	FindById(id int64) domain.Product
+}
+
+type MysqlDB struct {
+	Mysql sql.DB
+}
+
+func (db *MysqlDB) Save(product domain.Product) (code int64) {
 	ConnectionDB := ConnectDB()
 	sql := `INSERT into products (code, name, buy_price , sell_price, brand, creation_date) values (null, ? , ? , ?, ?, ?);`
 	queryResult, err := ConnectionDB.Exec(
@@ -27,7 +38,7 @@ func Save(product domain.Product) (code int64) {
 	return
 }
 
-func FindAll() []domain.Product {
+func (db *MysqlDB) FindAll() []domain.Product {
 	ConnectionDB := ConnectDB()
 	queryResult, err := ConnectionDB.Query("SELECT * from products")
 	if err != nil {
@@ -52,7 +63,7 @@ func FindAll() []domain.Product {
 	return products
 }
 
-func FindById(id int64) domain.Product {
+func (db *MysqlDB) FindById(id int64) domain.Product {
 	ConnectionDB := ConnectDB()
 	queryResult := ConnectionDB.QueryRow("SELECT * from products where code=?", id)
 

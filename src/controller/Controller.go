@@ -11,7 +11,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func CreateProduct(writer http.ResponseWriter, httpRequest *http.Request) {
+type Controller interface {
+	CreateProduct(writer http.ResponseWriter, httpRequest *http.Request)
+	FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request)
+	FindProductById(writer http.ResponseWriter, httpRequest *http.Request)
+	OptionsForBrowsers(writer http.ResponseWriter, httpRequest *http.Request)
+}
+
+type ControllerImpl struct {
+	Service service.ProductService
+}
+
+func (controller *ControllerImpl) CreateProduct(writer http.ResponseWriter, httpRequest *http.Request) {
 
 	var productRequest web_request.Product
 
@@ -20,7 +31,7 @@ func CreateProduct(writer http.ResponseWriter, httpRequest *http.Request) {
 		panic(err)
 	}
 
-	productResponse := service.CreateProduct(productRequest.ToDomain()).ToResponse()
+	productResponse := controller.Service.CreateProduct(productRequest.ToDomain()).ToResponse()
 
 	responseBody, err := json.Marshal(productResponse)
 	if err != nil {
@@ -35,9 +46,9 @@ func CreateProduct(writer http.ResponseWriter, httpRequest *http.Request) {
 	println(string(responseBody))
 }
 
-func FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request) {
+func (controller *ControllerImpl) FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request) {
 
-	products := service.FindAllProducts()
+	products := controller.Service.FindAllProducts()
 	responseBody, err := json.Marshal(domain.ProductsDomainToProductsResponse(products))
 	if err != nil {
 		panic(err)
@@ -49,13 +60,13 @@ func FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request) {
 
 }
 
-func FindProductById(writer http.ResponseWriter, httpRequest *http.Request) {
+func (controller *ControllerImpl) FindProductById(writer http.ResponseWriter, httpRequest *http.Request) {
 	vars := mux.Vars(httpRequest)
 	code, err := strconv.ParseInt(vars["code"], 10, 64)
 	if err != nil {
 		panic(err.Error())
 	}
-	product := service.FindProductById(code)
+	product := controller.Service.FindProductById(code)
 	responseBody, err := json.Marshal(product)
 	if err != nil {
 		panic(err)
@@ -66,7 +77,7 @@ func FindProductById(writer http.ResponseWriter, httpRequest *http.Request) {
 	writer.Write(responseBody)
 }
 
-func OptionsForBrowsers(writer http.ResponseWriter, httpRequest *http.Request) {
+func (controller *ControllerImpl) OptionsForBrowsers(writer http.ResponseWriter, httpRequest *http.Request) {
 	writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
 	writer.Header().Set("Access-Control-Allow-Headers", "content-type")
 }
