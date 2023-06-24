@@ -14,16 +14,16 @@ type databaseMock struct {
 	mock.Mock
 }
 
-func (mock *databaseMock) Save(product domain.Product) int64 {
+func (mock *databaseMock) Save(product domain.Product) (int64, error) {
 	args := mock.Called(product)
-	return int64(args.Int(0))
+	return int64(args.Int(0)), nil
 }
-func (mock *databaseMock) FindAll() []domain.Product {
-	return []domain.Product{}
+func (mock *databaseMock) FindAll() ([]domain.Product, error) {
+	return []domain.Product{}, nil
 }
 
-func (mock *databaseMock) FindById(id int64) domain.Product {
-	return domain.Product{}
+func (mock *databaseMock) FindById(id int64) (domain.Product, error) {
+	return domain.Product{}, nil
 }
 
 var dbMock = &databaseMock{}
@@ -38,7 +38,7 @@ func TestProductServiceImpl_CreateProduct(t *testing.T) {
 
 	dbMock.On("Save", product).Return(1)
 
-	if got := productService.CreateProduct(product); !reflect.DeepEqual(got, wantProduct) {
+	if got, _ := productService.CreateProduct(product); !reflect.DeepEqual(got, wantProduct) {
 		t.Errorf("ProductServiceImpl.CreateProduct() = %v, want %v", got, wantProduct)
 	}
 

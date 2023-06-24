@@ -2,11 +2,13 @@ package controller
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"sale-system/src/model/domain"
 	"sale-system/src/model/web_request"
 	"sale-system/src/service"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -30,11 +32,19 @@ func (controller *ControllerImpl) CreateProduct(writer http.ResponseWriter, http
 	if err != nil {
 		panic(err)
 	}
+	product, err := controller.Service.CreateProduct(productRequest.ToDomain())
 
-	productResponse := controller.Service.CreateProduct(productRequest.ToDomain()).ToResponse()
+	if err != nil {
+		handler(err, writer)
+		return
+	}
+
+	productResponse := product.ToResponse()
 
 	responseBody, err := json.Marshal(productResponse)
+
 	if err != nil {
+		log.Fatal(err)
 		panic(err)
 	}
 
@@ -48,7 +58,7 @@ func (controller *ControllerImpl) CreateProduct(writer http.ResponseWriter, http
 
 func (controller *ControllerImpl) FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request) {
 
-	products := controller.Service.FindAllProducts()
+	products, _ := controller.Service.FindAllProducts()
 	responseBody, err := json.Marshal(domain.ProductsDomainToProductsResponse(products))
 	if err != nil {
 		panic(err)
@@ -66,7 +76,7 @@ func (controller *ControllerImpl) FindProductById(writer http.ResponseWriter, ht
 	if err != nil {
 		panic(err.Error())
 	}
-	product := controller.Service.FindProductById(code)
+	product, _ := controller.Service.FindProductById(code)
 	responseBody, err := json.Marshal(product)
 	if err != nil {
 		panic(err)
@@ -80,4 +90,18 @@ func (controller *ControllerImpl) FindProductById(writer http.ResponseWriter, ht
 func (controller *ControllerImpl) OptionsForBrowsers(writer http.ResponseWriter, httpRequest *http.Request) {
 	writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
 	writer.Header().Set("Access-Control-Allow-Headers", "content-type")
+}
+
+func handler(err error, writer http.ResponseWriter) {
+	log.Println(err)
+
+	if strings.Contains(err.Error(), "1062") {
+		writer.WriteHeader(http.StatusUnprocessableEntity)
+		json.NewEncoder(writer).Encode("Product already registered!")
+		return
+	} else {
+		writer.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(writer).Encode("Internal Server Error, try again in few moments")
+		return
+	}
 }

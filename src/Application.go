@@ -25,9 +25,9 @@ func registerProductRouter(router *mux.Router, controller controller.Controller)
 	router.HandleFunc("/products/{code}", controller.FindProductById).Methods("GET")
 }
 
-func setUp() (controller.Controller) {
+func setUp() controller.Controller {
 	databases := &repository.MysqlDB{Mysql: *repository.ConnectDB()}
-	service := &service.ProductServiceImpl{Database : databases}
+	service := &service.ProductServiceImpl{Database: databases}
 	controller := &controller.ControllerImpl{Service: service}
 	return controller
 }

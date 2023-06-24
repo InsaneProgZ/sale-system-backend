@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS products (
     code int NOT NULL AUTO_INCREMENT,
-    name varchar(255) NOT NULL,
+    name varchar(255) NOT NULL UNIQUE,
     buy_price int,
     sell_price int NOT NULL,
     brand varchar(255) NOT NULL,
