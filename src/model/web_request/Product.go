@@ -6,10 +6,10 @@ import (
 )
 
 type Product struct {
-	Name      string `json:"name"`
-	BuyPrice  uint64 `json:"buy_price"`
-	SellPrice uint64 `json:"sell_price"`
-	Brand     string `json:"brand"`
+	Name      string `json:"name" validate:"required"`
+	BuyPrice  uint64 `json:"buy_price" validate:"gt=0"`
+	SellPrice uint64 `json:"sell_price" validate:"required"`
+	Brand     string `json:"brand" validate:"required"`
 }
 
 func (product Product) ToDomain() domain.Product {

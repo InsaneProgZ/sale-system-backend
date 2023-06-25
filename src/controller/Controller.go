@@ -26,13 +26,19 @@ type ControllerImpl struct {
 
 func (controller *ControllerImpl) CreateProduct(writer http.ResponseWriter, httpRequest *http.Request) {
 
-	var productRequest web_request.Product
+	var request web_request.Product
 
-	err := json.NewDecoder(httpRequest.Body).Decode(&productRequest)
+	err := json.NewDecoder(httpRequest.Body).Decode(&request)
 	if err != nil {
 		panic(err)
 	}
-	product, err := controller.Service.CreateProduct(productRequest.ToDomain())
+
+	err = ValidateCreateRequest(request, writer)
+	if err != nil {
+		return
+	}
+
+	product, err := controller.Service.CreateProduct(request.ToDomain())
 
 	if err != nil {
 		handler(err, writer)
@@ -74,7 +80,7 @@ func (controller *ControllerImpl) FindProductById(writer http.ResponseWriter, ht
 	vars := mux.Vars(httpRequest)
 	code, err := strconv.ParseInt(vars["code"], 10, 64)
 	if err != nil {
-		panic(err.Error())
+		log.Println(err)
 	}
 	product, _ := controller.Service.FindProductById(code)
 	responseBody, err := json.Marshal(product)
