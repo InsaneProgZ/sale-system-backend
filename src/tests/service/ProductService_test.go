@@ -28,7 +28,7 @@ func (mock *databaseMock) FindById(id int64) (domain.Product, error) {
 
 var dbMock = &databaseMock{}
 
-var productService = &service.ProductServiceImpl{Database: dbMock}
+var productService = &service.ProductServiceImpl{Repository: dbMock}
 
 func TestProductServiceImpl_CreateProduct(t *testing.T) {
 

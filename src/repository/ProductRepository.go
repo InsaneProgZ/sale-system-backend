@@ -14,13 +14,12 @@ type Database interface {
 }
 
 type MysqlDB struct {
-	Mysql sql.DB
+	Mysql *sql.DB
 }
 
-func (db *MysqlDB) Save(product domain.Product) (code int64, err error) {
-	ConnectionDB := ConnectDB()
+func (database *MysqlDB) Save(product domain.Product) (code int64, err error) {
 	sql := `INSERT into products (code, name, buy_price , sell_price, brand, creation_date) values (null, ? , ? , ?, ?, ?);`
-	queryResult, err := ConnectionDB.Exec(
+	queryResult, err := database.Mysql.Exec(
 		sql,
 		product.Name,
 		product.BuyPrice,
@@ -31,7 +30,6 @@ func (db *MysqlDB) Save(product domain.Product) (code int64, err error) {
 		log.Println(err)
 		return
 	}
-	defer ConnectionDB.Close()
 
 	code, err = queryResult.LastInsertId()
 	if err != nil {
@@ -40,15 +38,14 @@ func (db *MysqlDB) Save(product domain.Product) (code int64, err error) {
 	return
 }
 
-func (db *MysqlDB) FindAll() ([]domain.Product, error) {
-	ConnectionDB := ConnectDB()
-	queryResult, err := ConnectionDB.Query("SELECT * from products")
-	if err != nil {
-		panic(err)
-	}
-	defer ConnectionDB.Close()
+func (database *MysqlDB) FindAll() (products []domain.Product, err error) {
 
-	products := []domain.Product{}
+	queryResult, err := database.Mysql.Query("SELECT * from products")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	for queryResult.Next() {
 		product := domain.Product{}
 
@@ -62,18 +59,16 @@ func (db *MysqlDB) FindAll() ([]domain.Product, error) {
 			product.SellPrice,
 			product.Creation_date.Format("Monday, 02-Jan-06 15:04:05 MST"))
 	}
-	return products, nil
+	return
 }
 
-func (db *MysqlDB) FindById(id int64) (domain.Product, error) {
-	ConnectionDB := ConnectDB()
-	queryResult := ConnectionDB.QueryRow("SELECT * from products where code=?", id)
+func (database *MysqlDB) FindById(id int64) (product domain.Product, err error) {
 
-	defer ConnectionDB.Close()
+	queryResult := database.Mysql.QueryRow("SELECT * from products where code=?", id)
 
-	product := domain.Product{}
-	queryResult.Scan(&product.Code, &product.Name, &product.BuyPrice, &product.SellPrice, &product.Brand, &product.Creation_date)
+	err = queryResult.Scan(&product.Code, &product.Name, &product.BuyPrice, &product.SellPrice, &product.Brand, &product.Creation_date)
+
 	product.Creation_date = product.Creation_date.In(time.Local)
-	// println(product.Code, product.Name, product.BuyPrice, product.SellPrice, product.Brand, product.Creation_date.String())
-	return product, nil
+
+	return
 }

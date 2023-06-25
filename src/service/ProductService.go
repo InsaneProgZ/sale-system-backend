@@ -13,12 +13,12 @@ type ProductService interface {
 }
 
 type ProductServiceImpl struct {
-	Database repository.Database
+	Repository repository.Database
 }
 
 func (productService *ProductServiceImpl) CreateProduct(product domain.Product) (_ domain.Product, err error) {
 
-	product.Code, err = productService.Database.Save(product)
+	product.Code, err = productService.Repository.Save(product)
 	if err != nil {
 		log.Println(err)
 		return
@@ -28,9 +28,9 @@ func (productService *ProductServiceImpl) CreateProduct(product domain.Product) 
 }
 
 func (productService *ProductServiceImpl) FindAllProducts() (_ []domain.Product, err error) {
-	return productService.Database.FindAll()
+	return productService.Repository.FindAll()
 }
 
 func (productService *ProductServiceImpl) FindProductById(id int64) (_ domain.Product, err error) {
-	return productService.Database.FindById(id)
+	return productService.Repository.FindById(id)
 }

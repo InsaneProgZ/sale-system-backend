@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"net/http"
 	"sale-system/src/controller"
 	"sale-system/src/repository"
@@ -11,7 +12,9 @@ import (
 
 func main() {
 	router := mux.NewRouter()
-	controller := setUp()
+	
+	controller, database := setUp()
+	defer database.Close()
 
 	registerProductRouter(router, controller)
 
@@ -25,9 +28,10 @@ func registerProductRouter(router *mux.Router, controller controller.Controller)
 	router.HandleFunc("/products/{code}", controller.FindProductById).Methods("GET")
 }
 
-func setUp() controller.Controller {
-	databases := &repository.MysqlDB{Mysql: *repository.ConnectDB()}
-	service := &service.ProductServiceImpl{Database: databases}
+func setUp() (controller.Controller, *sql.DB) {
+	database := repository.ConnectDB()
+	repository := &repository.MysqlDB{Mysql: database}
+	service := &service.ProductServiceImpl{Repository: repository}
 	controller := &controller.ControllerImpl{Service: service}
-	return controller
+	return controller, database
 }

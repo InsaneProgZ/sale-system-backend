@@ -8,7 +8,7 @@ import (
 type Product struct {
 	Name      string `json:"name" validate:"required"`
 	BuyPrice  uint64 `json:"buy_price" validate:"gt=0"`
-	SellPrice uint64 `json:"sell_price" validate:"required"`
+	SellPrice uint64 `json:"sell_price" validate:"gt=0"`
 	Brand     string `json:"brand" validate:"required"`
 }
 
