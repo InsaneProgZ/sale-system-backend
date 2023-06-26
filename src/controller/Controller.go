@@ -24,7 +24,7 @@ type ControllerImpl struct {
 
 func (controller *ControllerImpl) CreateProduct(writer http.ResponseWriter, httpRequest *http.Request) {
 
-	var request web_request.Product
+	var request web_request.CreateProductRequest
 
 	request, err := ValidateCreateRequest(httpRequest.Body, writer)
 	if err != nil {
@@ -76,7 +76,7 @@ func (controller *ControllerImpl) ChangeProductByCode(writer http.ResponseWriter
 		handler(err, writer)
 		return
 	}
-	request, err := ValidateCreateRequest(httpRequest.Body, writer)
+	request, err := ValidateUpdateRequest(httpRequest.Body, writer)
 	if err != nil {
 		return
 	}

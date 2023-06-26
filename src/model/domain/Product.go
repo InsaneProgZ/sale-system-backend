@@ -11,7 +11,7 @@ type Product struct {
 	Brand         string
 	BuyPrice      uint64
 	SellPrice     uint64
-	Creation_date time.Time
+	Creation_date *time.Time
 }
 
 func (product Product) ToResponse() web_response.Product {

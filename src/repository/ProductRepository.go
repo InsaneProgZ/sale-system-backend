@@ -46,7 +46,8 @@ func (database *MysqlDB) FindAll() (products []domain.Product, err error) {
 		product := domain.Product{}
 
 		queryResult.Scan(&product.Code, &product.Name, &product.BuyPrice, &product.SellPrice, &product.Brand, &product.Creation_date)
-		product.Creation_date = product.Creation_date.In(time.Local)
+		localTime := product.Creation_date.In(time.Local)
+		product.Creation_date = &localTime
 		products = append(products, product)
 	}
 	return
@@ -56,7 +57,8 @@ func (database *MysqlDB) FindByCode(id int64) (product domain.Product, err error
 	queryResult := database.Mysql.QueryRow("SELECT * from products where code=?", id)
 
 	err = queryResult.Scan(&product.Code, &product.Name, &product.BuyPrice, &product.SellPrice, &product.Brand, &product.Creation_date)
-	product.Creation_date = product.Creation_date.In(time.Local)
+	localTime := product.Creation_date.In(time.Local)
+	product.Creation_date = &localTime
 	return
 }
 
@@ -83,24 +85,37 @@ func createUpdateQuery(code int64, product domain.Product) (sql string, params [
 	productValue := reflect.ValueOf(product)
 
 	for i := 0; i < productType.NumField(); i++ {
-		log.Println(sql)
+		log.Println(productType.Field(i).Name)
 		switch productType.Field(i).Name {
 		case "Name":
+			if productValue.Field(i).Interface() != ""{
 			sql += " name = ?,"
 			params = append(params, productValue.Field(i).Interface())
+			}
 		case "BuyPrice":
+			if productValue.Field(i).Interface() != ""{
 			sql += " buy_price = ?,"
 			params = append(params, productValue.Field(i).Interface())
+			}
 		case "SellPrice":
+			if productValue.Field(i).Interface() != ""{
 			sql += " sell_price = ?,"
 			params = append(params, productValue.Field(i).Interface())
+			}
 		case "Brand":
+			if productValue.Field(i).Interface() != ""{
 			sql += " brand = ?,"
 			params = append(params, productValue.Field(i).Interface())
+			}
+		default :
+		
 		}
 	}
 	sql = sql[:len(sql)-1]
 	sql += " WHERE code = ?"
 	params = append(params, code)
+
+	log.Println(sql)
+	log.Println(params...)
 	return
 }
