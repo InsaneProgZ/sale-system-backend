@@ -12,7 +12,7 @@ import (
 
 func main() {
 	router := mux.NewRouter()
-	
+
 	controller, database := setUp()
 	defer database.Close()
 
@@ -25,7 +25,8 @@ func registerProductRouter(router *mux.Router, controller controller.Controller)
 	router.HandleFunc("/products", controller.OptionsForBrowsers).Methods("OPTIONS")
 	router.HandleFunc("/products", controller.FindAllProducts).Methods("GET")
 	router.HandleFunc("/products", controller.CreateProduct).Methods("POST")
-	router.HandleFunc("/products/{code}", controller.FindProductById).Methods("GET")
+	router.HandleFunc("/products/{code}", controller.FindProductByCode).Methods("GET")
+	router.HandleFunc("/products/{code}", controller.ChangeProductByCode).Methods("PUT")
 }
 
 func setUp() (controller.Controller, *sql.DB) {

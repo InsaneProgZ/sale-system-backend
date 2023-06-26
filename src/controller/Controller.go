@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"log"
 	"net/http"
 	"sale-system/src/model/domain"
 	"sale-system/src/model/web_request"
@@ -14,7 +13,8 @@ import (
 type Controller interface {
 	CreateProduct(writer http.ResponseWriter, httpRequest *http.Request)
 	FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request)
-	FindProductById(writer http.ResponseWriter, httpRequest *http.Request)
+	FindProductByCode(writer http.ResponseWriter, httpRequest *http.Request)
+	ChangeProductByCode(writer http.ResponseWriter, httpRequest *http.Request)
 	OptionsForBrowsers(writer http.ResponseWriter, httpRequest *http.Request)
 }
 
@@ -52,22 +52,38 @@ func (controller *ControllerImpl) FindAllProducts(writer http.ResponseWriter, ht
 	setResponse(writer, http.StatusOK, []header{contentType}, domain.ProductsDomainToProductsResponse(products))
 }
 
-func (controller *ControllerImpl) FindProductById(writer http.ResponseWriter, httpRequest *http.Request) {
+func (controller *ControllerImpl) FindProductByCode(writer http.ResponseWriter, httpRequest *http.Request) {
 	vars := mux.Vars(httpRequest)
 	code, err := strconv.ParseInt(vars["code"], 10, 64)
 	if err != nil {
-		log.Println(err)
 		handler(err, writer)
 		return
 	}
 
-	product, err := controller.Service.FindProductById(code)
+	product, err := controller.Service.FindProductByCode(code)
 	if err != nil {
 		handler(err, writer)
 		return
 	}
 
-	setResponse(writer, http.StatusOK, []header{contentType}, product)
+	setResponse(writer, http.StatusOK, []header{contentType}, product.ToResponse())
+}
+
+func (controller *ControllerImpl) ChangeProductByCode(writer http.ResponseWriter, httpRequest *http.Request) {
+	vars := mux.Vars(httpRequest)
+	code, err := strconv.ParseInt(vars["code"], 10, 64)
+	if err != nil {
+		handler(err, writer)
+		return
+	}
+	request, err := ValidateCreateRequest(httpRequest.Body, writer)
+	if err != nil {
+		return
+	}
+	err = controller.Service.ChangeProductByCode(code, request.ToDomain())
+	if err != nil {
+		handler(err, writer)
+	}
 }
 
 func (controller *ControllerImpl) OptionsForBrowsers(writer http.ResponseWriter, httpRequest *http.Request) {

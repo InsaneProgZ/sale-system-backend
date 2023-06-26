@@ -8,7 +8,8 @@ import (
 type ProductService interface {
 	CreateProduct(product domain.Product) (domain.Product, error)
 	FindAllProducts() ([]domain.Product, error)
-	FindProductById(id int64) (domain.Product, error)
+	FindProductByCode(id int64) (domain.Product, error)
+	ChangeProductByCode(id int64, oldProduct domain.Product) error
 }
 
 type ProductServiceImpl struct {
@@ -29,7 +30,12 @@ func (productService *ProductServiceImpl) FindAllProducts() (_ []domain.Product,
 	return productService.Repository.FindAll()
 }
 
-func (productService *ProductServiceImpl) FindProductById(id int64) (product domain.Product, err error) {
-	product, err = productService.Repository.FindById(id)
+func (productService *ProductServiceImpl) FindProductByCode(id int64) (product domain.Product, err error) {
+	product, err = productService.Repository.FindByCode(id)
+	return
+}
+
+func (productService *ProductServiceImpl) ChangeProductByCode(id int64, oldProduct domain.Product) (err error) {
+	err = productService.Repository.ChangeProductByCode(id, oldProduct)
 	return
 }

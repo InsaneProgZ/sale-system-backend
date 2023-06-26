@@ -22,8 +22,12 @@ func (mock *databaseMock) FindAll() ([]domain.Product, error) {
 	return []domain.Product{}, nil
 }
 
-func (mock *databaseMock) FindById(id int64) (domain.Product, error) {
+func (mock *databaseMock) FindByCode(id int64) (domain.Product, error) {
 	return domain.Product{}, nil
+}
+
+func (mock *databaseMock) ChangeProductByCode(id int64, oldProduct domain.Product) (err error) {
+	return nil
 }
 
 var dbMock = &databaseMock{}
