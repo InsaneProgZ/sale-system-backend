@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"log"
 	"sale-system/src/model/domain"
 	"time"
 )
@@ -30,12 +31,10 @@ func (database *MysqlDB) Save(product domain.Product) (code int64, err error) {
 	}
 
 	code, err = queryResult.LastInsertId()
-
 	return
 }
 
 func (database *MysqlDB) FindAll() (products []domain.Product, err error) {
-
 	queryResult, err := database.Mysql.Query("SELECT * from products")
 	if err != nil {
 		return
@@ -58,11 +57,10 @@ func (database *MysqlDB) FindAll() (products []domain.Product, err error) {
 }
 
 func (database *MysqlDB) FindById(id int64) (product domain.Product, err error) {
-
 	queryResult := database.Mysql.QueryRow("SELECT * from products where code=?", id)
 
 	err = queryResult.Scan(&product.Code, &product.Name, &product.BuyPrice, &product.SellPrice, &product.Brand, &product.Creation_date)
-
 	product.Creation_date = product.Creation_date.In(time.Local)
+	log.Println(err)
 	return
 }

@@ -1,27 +1,32 @@
 package controller
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"strings"
 )
 
-func Handler(err error, writer http.ResponseWriter) {
-	
+func handler(err error, writer http.ResponseWriter) {
 	log.Println(err)
 
 	if strings.Contains(err.Error(), CodeErrors["name_exists"]) {
 		errorResponse := GenericErrorResponse{
 			Message: "Product already registered!",
 		}
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusUnprocessableEntity)
-		json.NewEncoder(writer).Encode(errorResponse)
+		setResponse(writer, http.StatusUnprocessableEntity, []header{contentType}, errorResponse)
+		return
+	} else if strings.Contains(err.Error(), CodeErrors["id_not_exists"]) {
+		errorResponse := GenericErrorResponse{
+			Message: "Product id not exists!",
+		}
+		setResponse(writer, http.StatusUnprocessableEntity, []header{contentType}, errorResponse)
 		return
 	} else {
-		writer.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(writer).Encode("Internal Server Error, try again in few moments")
+		errorResponse := GenericErrorResponse{
+			Message: "Internal Server Error, try again in few moments",
+		}
+		setResponse(writer, http.StatusInternalServerError, []header{contentType}, errorResponse)
 		return
 	}
+
 }

@@ -15,5 +15,6 @@ var ValidationsMessage = map[string]string{
 }
 
 var CodeErrors = map[string]string{
-	"name_exists": "1062",
+	"name_exists":   "1062",
+	"id_not_exists": "no rows in result",
 }

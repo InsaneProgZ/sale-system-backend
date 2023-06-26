@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"sale-system/src/model/domain"
@@ -35,39 +34,22 @@ func (controller *ControllerImpl) CreateProduct(writer http.ResponseWriter, http
 	product, err := controller.Service.CreateProduct(request.ToDomain())
 
 	if err != nil {
-		Handler(err, writer)
+		handler(err, writer)
 		return
 	}
 
-	writer.Header().Set("Content-Type", "application/json")
-	writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
-	writer.Header().Set("Access-Control-Allow-Headers", "content-type")
-	writer.WriteHeader(http.StatusCreated)
-
-	err = json.NewEncoder(writer).Encode(product.ToResponse())
-	if err != nil {
-		log.Println(err)
-	}
+	setResponse(writer, http.StatusCreated, []header{contentType}, product.ToResponse())
 }
 
 func (controller *ControllerImpl) FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request) {
 
 	products, err := controller.Service.FindAllProducts()
 	if err != nil {
-		Handler(err, writer)
+		handler(err, writer)
 		return
 	}
 
-	responseBody, err := json.Marshal(domain.ProductsDomainToProductsResponse(products))
-	if err != nil {
-		log.Println(err)
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(responseBody)
-
+	setResponse(writer, http.StatusOK, []header{contentType}, domain.ProductsDomainToProductsResponse(products))
 }
 
 func (controller *ControllerImpl) FindProductById(writer http.ResponseWriter, httpRequest *http.Request) {
@@ -75,16 +57,17 @@ func (controller *ControllerImpl) FindProductById(writer http.ResponseWriter, ht
 	code, err := strconv.ParseInt(vars["code"], 10, 64)
 	if err != nil {
 		log.Println(err)
-	}
-	product, _ := controller.Service.FindProductById(code)
-	responseBody, err := json.Marshal(product)
-	if err != nil {
-		panic(err)
+		handler(err, writer)
+		return
 	}
 
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(responseBody)
+	product, err := controller.Service.FindProductById(code)
+	if err != nil {
+		handler(err, writer)
+		return
+	}
+
+	setResponse(writer, http.StatusOK, []header{contentType}, product)
 }
 
 func (controller *ControllerImpl) OptionsForBrowsers(writer http.ResponseWriter, httpRequest *http.Request) {

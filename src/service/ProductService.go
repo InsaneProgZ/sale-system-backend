@@ -29,6 +29,7 @@ func (productService *ProductServiceImpl) FindAllProducts() (_ []domain.Product,
 	return productService.Repository.FindAll()
 }
 
-func (productService *ProductServiceImpl) FindProductById(id int64) (_ domain.Product, err error) {
-	return productService.Repository.FindById(id)
+func (productService *ProductServiceImpl) FindProductById(id int64) (product domain.Product, err error) {
+	product, err = productService.Repository.FindById(id)
+	return
 }
