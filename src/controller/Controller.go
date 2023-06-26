@@ -8,7 +8,6 @@ import (
 	"sale-system/src/model/web_request"
 	"sale-system/src/service"
 	"strconv"
-	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -28,12 +27,7 @@ func (controller *ControllerImpl) CreateProduct(writer http.ResponseWriter, http
 
 	var request web_request.Product
 
-	err := json.NewDecoder(httpRequest.Body).Decode(&request)
-	if err != nil {
-		panic(err)
-	}
-
-	err = ValidateCreateRequest(request, writer)
+	request, err := ValidateCreateRequest(httpRequest.Body, writer)
 	if err != nil {
 		return
 	}
@@ -41,34 +35,34 @@ func (controller *ControllerImpl) CreateProduct(writer http.ResponseWriter, http
 	product, err := controller.Service.CreateProduct(request.ToDomain())
 
 	if err != nil {
-		handler(err, writer)
+		Handler(err, writer)
 		return
-	}
-
-	productResponse := product.ToResponse()
-
-	responseBody, err := json.Marshal(productResponse)
-
-	if err != nil {
-		log.Fatal(err)
-		panic(err)
 	}
 
 	writer.Header().Set("Content-Type", "application/json")
 	writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
 	writer.Header().Set("Access-Control-Allow-Headers", "content-type")
 	writer.WriteHeader(http.StatusCreated)
-	writer.Write(responseBody)
-	println(string(responseBody))
+
+	err = json.NewEncoder(writer).Encode(product.ToResponse())
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (controller *ControllerImpl) FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request) {
 
-	products, _ := controller.Service.FindAllProducts()
+	products, err := controller.Service.FindAllProducts()
+	if err != nil {
+		Handler(err, writer)
+		return
+	}
+
 	responseBody, err := json.Marshal(domain.ProductsDomainToProductsResponse(products))
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
+
 	writer.Header().Set("Content-Type", "application/json")
 	writer.Header().Set("Access-Control-Allow-Origin", "*")
 	writer.WriteHeader(http.StatusOK)
@@ -96,18 +90,4 @@ func (controller *ControllerImpl) FindProductById(writer http.ResponseWriter, ht
 func (controller *ControllerImpl) OptionsForBrowsers(writer http.ResponseWriter, httpRequest *http.Request) {
 	writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
 	writer.Header().Set("Access-Control-Allow-Headers", "content-type")
-}
-
-func handler(err error, writer http.ResponseWriter) {
-	log.Println(err)
-
-	if strings.Contains(err.Error(), "1062") {
-		writer.WriteHeader(http.StatusUnprocessableEntity)
-		json.NewEncoder(writer).Encode("Product already registered!")
-		return
-	} else {
-		writer.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(writer).Encode("Internal Server Error, try again in few moments")
-		return
-	}
 }

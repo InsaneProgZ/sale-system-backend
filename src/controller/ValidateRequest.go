@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"reflect"
@@ -12,7 +13,13 @@ import (
 
 var validate = validator.New()
 
-func ValidateCreateRequest(request web_request.Product, writer http.ResponseWriter) (err error) {
+func ValidateCreateRequest(body io.ReadCloser, writer http.ResponseWriter) (request web_request.Product, err error) {
+	err = json.NewDecoder(body).Decode(&request)
+	if err != nil {
+		writer.Header().Set("Content-Type", "application/json")
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	err = validate.Struct(request)
 	if err == nil {
@@ -20,7 +27,7 @@ func ValidateCreateRequest(request web_request.Product, writer http.ResponseWrit
 	}
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusBadRequest)
-	var errorResponses []ErrorResponse
+	var errorResponses []BadRequestResponse
 
 	for _, err := range err.(validator.ValidationErrors) {
 
@@ -37,7 +44,7 @@ func ValidateCreateRequest(request web_request.Product, writer http.ResponseWrit
 
 		log.Printf("Field '%s' is %s %s", fieldName, ValidationsMessage[tag], param)
 
-		errorResponses = append(errorResponses, ErrorResponse{fieldName, ValidationsMessage[tag] + param})
+		errorResponses = append(errorResponses, BadRequestResponse{fieldName, ValidationsMessage[tag] + param})
 	}
 	json.NewEncoder(writer).Encode(errorResponses)
 	return

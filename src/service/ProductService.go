@@ -1,7 +1,6 @@
 package service
 
 import (
-	"log"
 	"sale-system/src/model/domain"
 	"sale-system/src/repository"
 )
@@ -20,7 +19,6 @@ func (productService *ProductServiceImpl) CreateProduct(product domain.Product) 
 
 	product.Code, err = productService.Repository.Save(product)
 	if err != nil {
-		log.Println(err)
 		return
 	}
 
