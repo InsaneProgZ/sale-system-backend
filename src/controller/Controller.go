@@ -70,6 +70,12 @@ func (controller *ControllerImpl) FindProductByCode(writer http.ResponseWriter, 
 }
 
 func (controller *ControllerImpl) ChangeProductByCode(writer http.ResponseWriter, httpRequest *http.Request) {
+	contentType := httpRequest.Header.Get("Content-Type")
+	if contentType != "application/json" {
+		http.Error(writer, "Unsupported Media Type", http.StatusUnsupportedMediaType)
+		return
+	}
+
 	vars := mux.Vars(httpRequest)
 	code, err := strconv.ParseInt(vars["code"], 10, 64)
 	if err != nil {

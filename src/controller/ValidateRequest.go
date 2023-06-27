@@ -52,9 +52,9 @@ func ValidateCreateRequest(body io.ReadCloser, writer http.ResponseWriter) (requ
 
 func ValidateUpdateRequest(body io.ReadCloser, writer http.ResponseWriter) (request web_request.UpdateProductRequest, err error) {
 	err = json.NewDecoder(body).Decode(&request)
+
 	if err != nil {
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
+		setResponse(writer, http.StatusBadRequest, []header{contentType}, nil)
 		return
 	}
 
@@ -62,13 +62,12 @@ func ValidateUpdateRequest(body io.ReadCloser, writer http.ResponseWriter) (requ
 	if err == nil {
 		return
 	}
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusBadRequest)
+
 	var errorResponses []BadRequestResponse
+	requestType := reflect.TypeOf(request)
 
 	for _, err := range err.(validator.ValidationErrors) {
 
-		requestType := reflect.TypeOf(request)
 		field, _ := requestType.FieldByName(err.Field())
 
 		fieldName := field.Tag.Get("json")
@@ -76,13 +75,11 @@ func ValidateUpdateRequest(body io.ReadCloser, writer http.ResponseWriter) (requ
 		param := err.Param()
 
 		if param != "" {
-			param = " " + param
+			param += " "
 		}
-
-		log.Printf("Field '%s' is %s %s", fieldName, ValidationsMessage[tag], param)
 
 		errorResponses = append(errorResponses, BadRequestResponse{fieldName, ValidationsMessage[tag] + param})
 	}
-	json.NewEncoder(writer).Encode(errorResponses)
+	setResponse(writer, http.StatusBadRequest, []header{contentType}, errorResponses)
 	return
 }

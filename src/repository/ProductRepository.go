@@ -2,14 +2,13 @@ package repository
 
 import (
 	"database/sql"
-	"log"
 	"reflect"
 	"sale-system/src/model/domain"
 	"time"
 )
 
 type Database interface {
-	Save(product domain.Product) (int64, error)
+	Save(product *domain.Product) (*int64, error)
 	FindAll() ([]domain.Product, error)
 	FindByCode(code int64) (domain.Product, error)
 	ChangeProductByCode(code int64, product domain.Product) error
@@ -19,7 +18,7 @@ type MysqlDB struct {
 	Mysql *sql.DB
 }
 
-func (database *MysqlDB) Save(product domain.Product) (code int64, err error) {
+func (database *MysqlDB) Save(product *domain.Product) (code *int64, err error) {
 	sql := `INSERT into products (code, name, buy_price , sell_price, brand, creation_date) values (null, ? , ? , ?, ?, ?);`
 	queryResult, err := database.Mysql.Exec(
 		sql,
@@ -32,7 +31,7 @@ func (database *MysqlDB) Save(product domain.Product) (code int64, err error) {
 		return
 	}
 
-	code, err = queryResult.LastInsertId()
+	*code, err = queryResult.LastInsertId()
 	return
 }
 
@@ -85,37 +84,33 @@ func createUpdateQuery(code int64, product domain.Product) (sql string, params [
 	productValue := reflect.ValueOf(product)
 
 	for i := 0; i < productType.NumField(); i++ {
-		log.Println(productType.Field(i).Name)
 		switch productType.Field(i).Name {
 		case "Name":
-			if productValue.Field(i).Interface() != ""{
-			sql += " name = ?,"
-			params = append(params, productValue.Field(i).Interface())
+			if !productValue.Field(i).IsNil() {
+				sql += " name = ?,"
+				params = append(params, *productValue.Field(i).Interface().(*string))
 			}
 		case "BuyPrice":
-			if productValue.Field(i).Interface() != ""{
-			sql += " buy_price = ?,"
-			params = append(params, productValue.Field(i).Interface())
+			if !productValue.Field(i).IsNil() {
+				sql += " buy_price = ?,"
+				params = append(params, *productValue.Field(i).Interface().(*uint64))
 			}
 		case "SellPrice":
-			if productValue.Field(i).Interface() != ""{
-			sql += " sell_price = ?,"
-			params = append(params, productValue.Field(i).Interface())
+			if !productValue.Field(i).IsNil() {
+				sql += " sell_price = ?,"
+				params = append(params, *productValue.Field(i).Interface().(*uint64))
 			}
 		case "Brand":
-			if productValue.Field(i).Interface() != ""{
-			sql += " brand = ?,"
-			params = append(params, productValue.Field(i).Interface())
+			if !productValue.Field(i).IsNil() {
+				sql += " brand = ?,"
+				params = append(params, *productValue.Field(i).Interface().(*string))
 			}
-		default :
-		
+		default:
+
 		}
 	}
 	sql = sql[:len(sql)-1]
 	sql += " WHERE code = ?"
 	params = append(params, code)
-
-	log.Println(sql)
-	log.Println(params...)
 	return
 }

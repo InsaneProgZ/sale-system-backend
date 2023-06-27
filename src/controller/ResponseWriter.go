@@ -19,10 +19,12 @@ func getHeader(header header) (key string, value string) {
 	return string(header), Headers[header]
 }
 
-func setResponse(writer http.ResponseWriter, statusCode int, headers []header, body any) {
+func setResponse(writer http.ResponseWriter, statusCode int, headers []header, body interface{}) {
 	for _, header := range headers {
 		writer.Header().Set(getHeader(header))
 	}
 	writer.WriteHeader(statusCode)
-	json.NewEncoder(writer).Encode(body)
+	if body != nil {
+		json.NewEncoder(writer).Encode(body)
+	}
 }

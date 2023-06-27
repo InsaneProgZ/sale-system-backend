@@ -6,17 +6,17 @@ import (
 )
 
 type ProductService interface {
-	CreateProduct(product domain.Product) (domain.Product, error)
+	CreateProduct(product *domain.Product) (*domain.Product, error)
 	FindAllProducts() ([]domain.Product, error)
 	FindProductByCode(id int64) (domain.Product, error)
-	ChangeProductByCode(id int64, oldProduct domain.Product) error
+	ChangeProductByCode(id int64, oldProduct *domain.Product) error
 }
 
 type ProductServiceImpl struct {
 	Repository repository.Database
 }
 
-func (productService *ProductServiceImpl) CreateProduct(product domain.Product) (_ domain.Product, err error) {
+func (productService *ProductServiceImpl) CreateProduct(product *domain.Product) (_ *domain.Product, err error) {
 
 	product.Code, err = productService.Repository.Save(product)
 	if err != nil {
@@ -35,7 +35,7 @@ func (productService *ProductServiceImpl) FindProductByCode(id int64) (product d
 	return
 }
 
-func (productService *ProductServiceImpl) ChangeProductByCode(id int64, oldProduct domain.Product) (err error) {
-	err = productService.Repository.ChangeProductByCode(id, oldProduct)
+func (productService *ProductServiceImpl) ChangeProductByCode(id int64, oldProduct *domain.Product) (err error) {
+	err = productService.Repository.ChangeProductByCode(id, *oldProduct)
 	return
 }
