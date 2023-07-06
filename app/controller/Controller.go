@@ -2,9 +2,9 @@ package controller
 
 import (
 	"net/http"
-	"sale-system/src/model/domain"
-	"sale-system/src/model/web_request"
-	"sale-system/src/service"
+	"sale-system/model/domain"
+	"sale-system/model/web_request"
+	"sale-system/service"
 	"strconv"
 
 	"github.com/gorilla/mux"

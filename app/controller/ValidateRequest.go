@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"reflect"
-	"sale-system/src/model/web_request"
+	"sale-system/model/web_request"
 
 	"github.com/go-playground/validator/v10"
 )

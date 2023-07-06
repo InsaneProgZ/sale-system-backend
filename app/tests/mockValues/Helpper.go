@@ -1,6 +1,6 @@
 package mockvalues
 
-import "sale-system/src/model/domain"
+import "sale-system/model/domain"
 
 func MockDomainProduct() domain.Product {
 	name := "smart phone"

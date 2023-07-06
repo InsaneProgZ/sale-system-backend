@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 	"reflect"
-	"sale-system/src/model/domain"
+	"sale-system/model/domain"
 	"time"
 )
 
@@ -30,7 +30,7 @@ func (database *MysqlDB) Save(product *domain.Product) (code *int64, err error) 
 	if err != nil {
 		return
 	}
-
+	code = new(int64)
 	*code, err = queryResult.LastInsertId()
 	return
 }

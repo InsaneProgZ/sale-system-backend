@@ -2,9 +2,9 @@ package service_test
 
 import (
 	"reflect"
-	"sale-system/src/model/domain"
-	"sale-system/src/service"
-	mockvalues "sale-system/src/tests/mockValues"
+	"sale-system/model/domain"
+	"sale-system/service"
+	mockvalues "sale-system/tests/mockValues"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -16,7 +16,7 @@ type databaseMock struct {
 
 func (mock *databaseMock) Save(product *domain.Product) (*int64, error) {
 	args := mock.Called(product)
-	code :=int64(args.Int(0))
+	code := int64(args.Int(0))
 	return &code, nil
 }
 func (mock *databaseMock) FindAll() ([]domain.Product, error) {

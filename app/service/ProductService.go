@@ -1,8 +1,8 @@
 package service
 
 import (
-	"sale-system/src/model/domain"
-	"sale-system/src/repository"
+	"sale-system/model/domain"
+	"sale-system/repository"
 )
 
 type ProductService interface {

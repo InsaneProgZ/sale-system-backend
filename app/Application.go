@@ -3,9 +3,9 @@ package main
 import (
 	"database/sql"
 	"net/http"
-	"sale-system/src/controller"
-	"sale-system/src/repository"
-	"sale-system/src/service"
+	"sale-system/controller"
+	"sale-system/repository"
+	"sale-system/service"
 
 	"github.com/gorilla/mux"
 )
@@ -18,7 +18,7 @@ func main() {
 
 	registerProductRouter(router, controller)
 
-	http.ListenAndServe("localhost:8080", router)
+	http.ListenAndServe(":8080", router)
 }
 
 func registerProductRouter(router *mux.Router, controller controller.Controller) {

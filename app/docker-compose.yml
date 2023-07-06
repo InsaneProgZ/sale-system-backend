@@ -1,7 +1,16 @@
 version: "3.3"
+
 services:
+  myservice:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
   db:
     image: mysql
+    container_name: db-container
     restart: always
     environment:
       MYSQL_DATABASE: "sale-system"
@@ -13,6 +22,12 @@ services:
     expose:
       - "3306"
     volumes:
-      - ./.docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - .././.docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - backend
 volumes:
   my-db:
+networks:
+  backend:
+    driver: bridge
+

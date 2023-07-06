@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"sale-system/src/model/web_response"
+	"sale-system/model/web_response"
 	"time"
 )
 

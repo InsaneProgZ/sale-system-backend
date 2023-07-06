@@ -1,7 +1,7 @@
 package web_request
 
 import (
-	"sale-system/src/model/domain"
+	"sale-system/model/domain"
 	"time"
 )
 
