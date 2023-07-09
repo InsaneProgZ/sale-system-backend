@@ -11,7 +11,7 @@ func ConnectDB() *sql.DB {
 	dbSource := fmt.Sprintf(
 		"yan:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true",
 		"yan",
-		"db-container",
+		"localhost", //db-container
 		"3306",
 		"sale-system",
 	)
