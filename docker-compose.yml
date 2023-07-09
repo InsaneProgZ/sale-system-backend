@@ -22,12 +22,9 @@ services:
     expose:
       - "3306"
     volumes:
-      - .././.docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./.docker/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - backend
-volumes:
-  my-db:
 networks:
   backend:
     driver: bridge
-
