@@ -1,16 +1,17 @@
 version: "3.3"
 
 services:
-  myservice:
+  sale-service-backend:
+    container_name: sale-service-backend
     build:
       context: .
     ports:
       - "8080:8080"
     networks:
       - backend
-  db:
+  mysql:
     image: mysql
-    container_name: db-container
+    container_name: mysql
     restart: always
     environment:
       MYSQL_DATABASE: "sale-system"

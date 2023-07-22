@@ -3,7 +3,6 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
-	"reflect"
 )
 
 var Headers = map[header]string{
@@ -25,7 +24,9 @@ func setResponse(writer http.ResponseWriter, statusCode int, headers []header, b
 		writer.Header().Set(getHeader(header))
 	}
 	writer.WriteHeader(statusCode)
-	if !reflect.ValueOf(body).IsNil() {
-		json.NewEncoder(writer).Encode(body)
+
+	if body == nil {
+		body = ""
 	}
+	json.NewEncoder(writer).Encode(body)
 }

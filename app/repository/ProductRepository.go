@@ -56,6 +56,9 @@ func (database *MysqlDB) FindByCode(id int64) (product domain.Product, err error
 	queryResult := database.Mysql.QueryRow("SELECT * from products where code=?", id)
 
 	err = queryResult.Scan(&product.Code, &product.Name, &product.BuyPrice, &product.SellPrice, &product.Brand, &product.Creation_date)
+	if err != nil {
+		return
+	}
 	localTime := product.Creation_date.In(time.Local)
 	product.Creation_date = &localTime
 	return
