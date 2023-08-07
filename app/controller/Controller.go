@@ -38,7 +38,7 @@ func (controller *ControllerImpl) CreateProduct(writer http.ResponseWriter, http
 		return
 	}
 
-	setResponse(writer, http.StatusCreated, []header{contentType}, product.ToResponse())
+	setResponse(writer, http.StatusCreated, []header{contentType, AccessControlAllowHeaders, AccessControlAllowOrigin}, product.ToResponse())
 }
 
 func (controller *ControllerImpl) FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request) {
@@ -49,7 +49,7 @@ func (controller *ControllerImpl) FindAllProducts(writer http.ResponseWriter, ht
 		return
 	}
 
-	setResponse(writer, http.StatusOK, []header{contentType}, domain.ProductsDomainToProductsResponse(products))
+	setResponse(writer, http.StatusOK, []header{contentType, AccessControlAllowHeaders, AccessControlAllowOrigin}, domain.ProductsDomainToProductsResponse(products))
 }
 
 func (controller *ControllerImpl) FindProductByCode(writer http.ResponseWriter, httpRequest *http.Request) {
@@ -66,12 +66,12 @@ func (controller *ControllerImpl) FindProductByCode(writer http.ResponseWriter, 
 		return
 	}
 
-	setResponse(writer, http.StatusOK, []header{contentType}, product.ToResponse())
+	setResponse(writer, http.StatusOK, []header{contentType, AccessControlAllowHeaders, AccessControlAllowOrigin}, product.ToResponse())
 }
 
 func (controller *ControllerImpl) ChangeProductByCode(writer http.ResponseWriter, httpRequest *http.Request) {
-	contentType := httpRequest.Header.Get("Content-Type")
-	if contentType != "application/json" {
+	contentTypeRequest := httpRequest.Header.Get("Content-Type")
+	if contentTypeRequest != "application/json" {
 		http.Error(writer, "Unsupported Media Type", http.StatusUnsupportedMediaType)
 		return
 	}
@@ -90,6 +90,7 @@ func (controller *ControllerImpl) ChangeProductByCode(writer http.ResponseWriter
 	if err != nil {
 		handler(err, writer)
 	}
+	setResponse(writer, http.StatusOK, []header{contentType, AccessControlAllowHeaders, AccessControlAllowOrigin}, nil)
 }
 
 func (controller *ControllerImpl) OptionsForBrowsers(writer http.ResponseWriter, httpRequest *http.Request) {

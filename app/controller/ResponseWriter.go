@@ -7,12 +7,16 @@ import (
 
 var Headers = map[header]string{
 	"Content-Type": "application/json",
+	"Access-Control-Allow-Origin": "http://localhost:4200",
+	"Access-Control-Allow-Headers": "content-type",
 }
 
 type header string
 
 const (
 	contentType header = "Content-Type"
+	AccessControlAllowOrigin header = "Access-Control-Allow-Origin"
+	AccessControlAllowHeaders header = "Access-Control-Allow-Headers"
 )
 
 func getHeader(header header) (key string, value string) {

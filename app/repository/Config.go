@@ -7,11 +7,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func ConnectDB() *sql.DB {
+func ConnectDB(dbUrl string) *sql.DB {
 	dbSource := fmt.Sprintf(
 		"yan:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true",
 		"yan",
-		"localhost", //db-container
+		dbUrl,
 		"3306",
 		"sale-system",
 	)

@@ -80,6 +80,6 @@ func ValidateUpdateRequest(body io.ReadCloser, writer http.ResponseWriter) (requ
 
 		errorResponses = append(errorResponses, BadRequestResponse{fieldName, ValidationsMessage[tag] + param})
 	}
-	setResponse(writer, http.StatusBadRequest, []header{contentType}, errorResponses)
+	setResponse(writer, http.StatusBadRequest, []header{contentType, AccessControlAllowHeaders, AccessControlAllowOrigin}, errorResponses)
 	return
 }
