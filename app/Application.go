@@ -19,7 +19,6 @@ func main() {
 	defer database.Close()
 
 	registerProductRouter(router, controller)
-
 	http.ListenAndServe(fmt.Sprintf("%s:8080", appConfig.AppUrl), router)
 }
 

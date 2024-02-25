@@ -16,7 +16,9 @@ func ConnectDB(dbUrl string) *sql.DB {
 		"sale-system",
 	)
 	ConnectionDB, err := sql.Open("mysql", dbSource)
+	
 	if err != nil {
+		println(err)
 		panic(err)
 	}
 	return ConnectionDB

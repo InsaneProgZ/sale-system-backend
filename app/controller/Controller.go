@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"sale-system/model/domain"
 	"sale-system/model/web_request"
@@ -23,13 +25,13 @@ type ControllerImpl struct {
 }
 
 func (controller *ControllerImpl) CreateProduct(writer http.ResponseWriter, httpRequest *http.Request) {
-
 	var request web_request.CreateProductRequest
 
 	request, err := ValidateCreateRequest(httpRequest.Body, writer)
 	if err != nil {
 		return
 	}
+	log.Println(fmt.Printf("Creating product %+v", request))
 
 	product, err := controller.Service.CreateProduct(request.ToDomain())
 
@@ -42,7 +44,7 @@ func (controller *ControllerImpl) CreateProduct(writer http.ResponseWriter, http
 }
 
 func (controller *ControllerImpl) FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request) {
-
+	log.Println("Find all products")
 	products, err := controller.Service.FindAllProducts()
 	if err != nil {
 		handler(err, writer)
@@ -54,12 +56,17 @@ func (controller *ControllerImpl) FindAllProducts(writer http.ResponseWriter, ht
 
 func (controller *ControllerImpl) FindProductByCode(writer http.ResponseWriter, httpRequest *http.Request) {
 	vars := mux.Vars(httpRequest)
-	code, err := strconv.ParseInt(vars["code"], 10, 64)
+	numberOfBits := 64
+	numberBase := 10
+
+	code, err := strconv.ParseInt(vars["code"], numberBase, numberOfBits)	
 	if err != nil {
 		handler(err, writer)
 		return
 	}
-
+	
+	log.Println(fmt.Printf("Creating product %d", code))
+	
 	product, err := controller.Service.FindProductByCode(code)
 	if err != nil {
 		handler(err, writer)

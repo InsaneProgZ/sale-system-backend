@@ -8,7 +8,7 @@ import (
 )
 
 type Database interface {
-	Save(product *domain.Product) (*int64, error)
+	Save(product domain.Product) (int64, error)
 	FindAll() ([]domain.Product, error)
 	FindByCode(code int64) (domain.Product, error)
 	ChangeProductByCode(code int64, product domain.Product) error
@@ -18,7 +18,7 @@ type MysqlDB struct {
 	Mysql *sql.DB
 }
 
-func (database *MysqlDB) Save(product *domain.Product) (code *int64, err error) {
+func (database *MysqlDB) Save(product domain.Product) (code int64, err error) {
 	sql := `INSERT into products (code, name, buy_price , sell_price, brand, creation_date) values (null, ? , ? , ?, ?, ?);`
 	queryResult, err := database.Mysql.Exec(
 		sql,
@@ -30,8 +30,7 @@ func (database *MysqlDB) Save(product *domain.Product) (code *int64, err error) 
 	if err != nil {
 		return
 	}
-	code = new(int64)
-	*code, err = queryResult.LastInsertId()
+	code, err = queryResult.LastInsertId()
 	return
 }
 
@@ -46,7 +45,7 @@ func (database *MysqlDB) FindAll() (products []domain.Product, err error) {
 
 		queryResult.Scan(&product.Code, &product.Name, &product.BuyPrice, &product.SellPrice, &product.Brand, &product.Creation_date)
 		localTime := product.Creation_date.In(time.Local)
-		product.Creation_date = &localTime
+		product.Creation_date = localTime
 		products = append(products, product)
 	}
 	return
@@ -60,7 +59,7 @@ func (database *MysqlDB) FindByCode(id int64) (product domain.Product, err error
 		return
 	}
 	localTime := product.Creation_date.In(time.Local)
-	product.Creation_date = &localTime
+	product.Creation_date = localTime
 	return
 }
 

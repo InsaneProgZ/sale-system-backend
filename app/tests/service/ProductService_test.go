@@ -14,10 +14,10 @@ type databaseMock struct {
 	mock.Mock
 }
 
-func (mock *databaseMock) Save(product *domain.Product) (*int64, error) {
+func (mock *databaseMock) Save(product domain.Product) (int64, error) {
 	args := mock.Called(product)
 	code := int64(args.Int(0))
-	return &code, nil
+	return code, nil
 }
 func (mock *databaseMock) FindAll() ([]domain.Product, error) {
 	return []domain.Product{}, nil
@@ -40,11 +40,11 @@ func TestProductServiceImpl_CreateProduct(t *testing.T) {
 	product := mockvalues.MockDomainProduct()
 	wantProduct := mockvalues.MockDomainProduct()
 	code := int64(1)
-	wantProduct.Code = &code
+	wantProduct.Code = code
 
 	dbMock.On("Save", product).Return(1)
 
-	if got, _ := productService.CreateProduct(&product); !reflect.DeepEqual(got, wantProduct) {
+	if got, _ := productService.CreateProduct(product); !reflect.DeepEqual(got, wantProduct) {
 		t.Errorf("ProductServiceImpl.CreateProduct() = %v, want %v", got, wantProduct)
 	}
 
