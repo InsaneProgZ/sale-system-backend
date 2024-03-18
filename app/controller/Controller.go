@@ -40,7 +40,7 @@ func (controller *ControllerImpl) CreateProduct(writer http.ResponseWriter, http
 		return
 	}
 
-	setResponse(writer, http.StatusCreated, []header{contentType, AccessControlAllowHeaders, AccessControlAllowOrigin}, product.ToResponse())
+	setResponse(writer, http.StatusCreated, []header{contentType, AccessControlAllowHeaders, AccessControlAllowOrigin, AccessControlAllowMethods}, product.ToResponse())
 }
 
 func (controller *ControllerImpl) FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request) {
@@ -101,6 +101,5 @@ func (controller *ControllerImpl) ChangeProductByCode(writer http.ResponseWriter
 }
 
 func (controller *ControllerImpl) OptionsForBrowsers(writer http.ResponseWriter, httpRequest *http.Request) {
-	writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
-	writer.Header().Set("Access-Control-Allow-Headers", "content-type")
+	setResponse(writer, http.StatusOK, []header{contentType, AccessControlAllowHeaders, AccessControlAllowOrigin}, nil)
 }

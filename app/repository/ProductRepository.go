@@ -19,12 +19,11 @@ type MysqlDB struct {
 }
 
 func (database *MysqlDB) Save(product domain.Product) (code int64, err error) {
-	sql := `INSERT into products (code, name, buy_price , sell_price, brand, creation_date) values (null, ? , ? , ?, ?, ?);`
+	sql := `INSERT into products (code, name, price, brand, creation_date) values (null, ? , ?, ?, ?);`
 	queryResult, err := database.Mysql.Exec(
 		sql,
 		product.Name,
-		product.BuyPrice,
-		product.SellPrice,
+		product.Price,
 		product.Brand,
 		product.Creation_date)
 	if err != nil {
@@ -43,7 +42,7 @@ func (database *MysqlDB) FindAll() (products []domain.Product, err error) {
 	for queryResult.Next() {
 		product := domain.Product{}
 
-		queryResult.Scan(&product.Code, &product.Name, &product.BuyPrice, &product.SellPrice, &product.Brand, &product.Creation_date)
+		queryResult.Scan(&product.Code, &product.Name, &product.Price, &product.Brand, &product.Creation_date)
 		localTime := product.Creation_date.In(time.Local)
 		product.Creation_date = localTime
 		products = append(products, product)
@@ -54,7 +53,7 @@ func (database *MysqlDB) FindAll() (products []domain.Product, err error) {
 func (database *MysqlDB) FindByCode(id int64) (product domain.Product, err error) {
 	queryResult := database.Mysql.QueryRow("SELECT * from products where code=?", id)
 
-	err = queryResult.Scan(&product.Code, &product.Name, &product.BuyPrice, &product.SellPrice, &product.Brand, &product.Creation_date)
+	err = queryResult.Scan(&product.Code, &product.Name, &product.Price, &product.Brand, &product.Creation_date)
 	if err != nil {
 		return
 	}
@@ -92,14 +91,9 @@ func createUpdateQuery(code int64, product domain.Product) (sql string, params [
 				sql += " name = ?,"
 				params = append(params, *productValue.Field(i).Interface().(*string))
 			}
-		case "BuyPrice":
+		case "Price":
 			if !productValue.Field(i).IsNil() {
-				sql += " buy_price = ?,"
-				params = append(params, *productValue.Field(i).Interface().(*uint64))
-			}
-		case "SellPrice":
-			if !productValue.Field(i).IsNil() {
-				sql += " sell_price = ?,"
+				sql += " price = ?,"
 				params = append(params, *productValue.Field(i).Interface().(*uint64))
 			}
 		case "Brand":
