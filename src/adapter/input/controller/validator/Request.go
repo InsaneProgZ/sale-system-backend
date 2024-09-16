@@ -6,14 +6,16 @@ import (
 	"log"
 	"net/http"
 	"reflect"
-	"sale-system/model/web_request"
 
+	"github.com/InsaneProgZ/sale-system-backend/adapter/input/controller/consts"
+	"github.com/InsaneProgZ/sale-system-backend/adapter/input/controller/request"
+	"github.com/InsaneProgZ/sale-system-backend/adapter/input/controller/response"
 	"github.com/go-playground/validator/v10"
 )
 
 var validate = validator.New()
 
-func ValidateCreateRequest(body io.ReadCloser, writer http.ResponseWriter) (request web_request.CreateProductRequest, err error) {
+func ValidateCreateRequest(body io.ReadCloser, writer http.ResponseWriter) (request request.CreateProductRequest, err error) {
 	err = json.NewDecoder(body).Decode(&request)
 	if err != nil {
 		writer.Header().Set("Content-Type", "application/json")
@@ -27,7 +29,7 @@ func ValidateCreateRequest(body io.ReadCloser, writer http.ResponseWriter) (requ
 	}
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusBadRequest)
-	var errorResponses []BadRequestResponse
+	var errorResponses []response.BadRequestResponse
 
 	for _, err := range err.(validator.ValidationErrors) {
 
@@ -42,19 +44,19 @@ func ValidateCreateRequest(body io.ReadCloser, writer http.ResponseWriter) (requ
 			param = " " + param
 		}
 
-		log.Printf("Field '%s' is %s %s", fieldName, ValidationsMessage[tag], param)
+		log.Printf("Field '%s' is %s %s", fieldName, response.ValidationsMessage[tag], param)
 
-		errorResponses = append(errorResponses, BadRequestResponse{fieldName, ValidationsMessage[tag] + param})
+		errorResponses = append(errorResponses, response.BadRequestResponse{Field: fieldName, Message: response.ValidationsMessage[tag] + param})
 	}
 	json.NewEncoder(writer).Encode(errorResponses)
 	return
 }
 
-func ValidateUpdateRequest(body io.ReadCloser, writer http.ResponseWriter) (request web_request.UpdateProductRequest, err error) {
+func ValidateUpdateRequest(body io.ReadCloser, writer http.ResponseWriter) (request request.UpdateProductRequest, err error) {
 	err = json.NewDecoder(body).Decode(&request)
 
 	if err != nil {
-		setResponse(writer, http.StatusBadRequest, []header{contentType}, nil)
+		response.SetResponse(writer, http.StatusBadRequest, []consts.Header{consts.ContentType}, nil)
 		return
 	}
 
@@ -63,7 +65,7 @@ func ValidateUpdateRequest(body io.ReadCloser, writer http.ResponseWriter) (requ
 		return
 	}
 
-	var errorResponses []BadRequestResponse
+	var errorResponses []response.BadRequestResponse
 	requestType := reflect.TypeOf(request)
 
 	for _, err := range err.(validator.ValidationErrors) {
@@ -78,8 +80,8 @@ func ValidateUpdateRequest(body io.ReadCloser, writer http.ResponseWriter) (requ
 			param += " "
 		}
 
-		errorResponses = append(errorResponses, BadRequestResponse{fieldName, ValidationsMessage[tag] + param})
+		errorResponses = append(errorResponses, response.BadRequestResponse{Field: fieldName, Message: response.ValidationsMessage[tag] + param})
 	}
-	setResponse(writer, http.StatusBadRequest, []header{contentType, AccessControlAllowHeaders, AccessControlAllowOrigin}, errorResponses)
+	response.SetResponse(writer, http.StatusBadRequest, []consts.Header{consts.ContentType, consts.AccessControlAllowHeaders, consts.AccessControlAllowOrigin}, errorResponses)
 	return
 }

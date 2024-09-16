@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"sale-system/controller"
-	"sale-system/repository"
-	"sale-system/service"
 
+	"github.com/InsaneProgZ/sale-system-backend/adapter/input/controller"
+	"github.com/InsaneProgZ/sale-system-backend/adapter/output/mysql"
+	"github.com/InsaneProgZ/sale-system-backend/domain/service"
 	"github.com/gorilla/mux"
 )
 
@@ -22,19 +22,21 @@ func main() {
 	http.ListenAndServe(fmt.Sprintf("%s:8080", appConfig.AppUrl), router)
 }
 
+const productResource = "/products"
+
 func registerProductRouter(router *mux.Router, controller controller.Controller) {
-	router.HandleFunc("/products", controller.OptionsForBrowsers).Methods("OPTIONS")
-	router.HandleFunc("/products", controller.FindAllProducts).Methods("GET")
-	router.HandleFunc("/products", controller.CreateProduct).Methods("POST")
-	router.HandleFunc("/products/{code}", controller.FindProductByCode).Methods("GET")
-	router.HandleFunc("/products/{code}", controller.ChangeProductByCode).Methods("PUT")
+	router.HandleFunc(productResource, controller.OptionsForBrowsers).Methods("OPTIONS")
+	router.HandleFunc(productResource, controller.FindAllProducts).Methods("GET")
+	router.HandleFunc(productResource, controller.CreateProduct).Methods("POST")
+	router.HandleFunc(productResource + "/{code}", controller.FindProductByCode).Methods("GET")
+	router.HandleFunc(productResource + "/{code}", controller.ChangeProductByCode).Methods("PUT")
 }
 
 func setUp() (controller.Controller, *sql.DB, AppConfig) {
 	var appConfig = getConfig()
-	database := repository.ConnectDB(appConfig.DBUrl)
-	repository := &repository.MysqlDB{Mysql: database}
-	service := &service.ProductServiceImpl{Repository: repository}
+	database := mysql.ConnectDB(appConfig.DBUrl)
+	mysql := &mysql.MysqlDB{Mysql: database}
+	service := &service.ProductServiceImpl{Repository: mysql}
 	controller := &controller.ControllerImpl{Service: service}
 	return controller, database, appConfig
 }

@@ -1,10 +1,10 @@
 # Stage 1: Download dependencies
-FROM golang:alpine AS dependencies
+FROM golang:alpine3.20 AS dependencies
 
 WORKDIR /build
 
 # Copy Go module files
-COPY /app/go.mod /app/go.sum ./
+COPY /src/go.mod /src/go.sum ./
 
 # Download dependencies
 RUN go mod download
@@ -15,15 +15,15 @@ FROM dependencies AS builder
 # Copy the rest of the application code
 RUN pwd && ls -l
 
-COPY /app .
+COPY /src .
 
 # Build the Go binary
 RUN GOARCH=amd64 GOOS=linux go build -o main
 
 # Stage 3: Final image
-FROM alpine:latest
+FROM alpine:2.7
 
-WORKDIR /app
+WORKDIR /src
 
 # Copy the binary from the builder stage
 COPY --from=builder /build/main ./

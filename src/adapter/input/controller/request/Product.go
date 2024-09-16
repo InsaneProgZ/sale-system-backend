@@ -1,8 +1,9 @@
-package web_request
+package request
 
 import (
-	"sale-system/model/domain"
 	"time"
+
+	"github.com/InsaneProgZ/sale-system-backend/domain/model"
 )
 
 type CreateProductRequest struct {
@@ -17,9 +18,9 @@ type UpdateProductRequest struct {
 	Brand string `json:"brand" validate:"required_without_all=Price Name"`
 }
 
-func (product CreateProductRequest) ToDomain() domain.Product {
+func CreateRequestToDomain(product CreateProductRequest) model.Product {
 	time := time.Now().UTC()
-	return domain.Product{
+	return model.Product{
 		Name:          product.Name,
 		Price:         product.Price,
 		Brand:         product.Brand,
@@ -27,8 +28,8 @@ func (product CreateProductRequest) ToDomain() domain.Product {
 	}
 }
 
-func (product UpdateProductRequest) ToDomain() domain.Product {
-	return domain.Product{
+func UpdateRequestToDomain(product UpdateProductRequest) model.Product {
+	return model.Product{
 		Name:          product.Name,
 		Price:         product.Price,
 		Brand:         product.Brand,

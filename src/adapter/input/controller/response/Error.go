@@ -1,4 +1,4 @@
-package controller
+package response
 
 type BadRequestResponse struct {
 	Field   string

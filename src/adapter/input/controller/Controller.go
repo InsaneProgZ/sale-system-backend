@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"sale-system/model/domain"
-	"sale-system/model/web_request"
-	"sale-system/service"
 	"strconv"
 
+	"github.com/InsaneProgZ/sale-system-backend/adapter/input/controller/consts"
+	"github.com/InsaneProgZ/sale-system-backend/adapter/input/controller/request"
+	"github.com/InsaneProgZ/sale-system-backend/adapter/input/controller/response"
+	v "github.com/InsaneProgZ/sale-system-backend/adapter/input/controller/validator"
+	"github.com/InsaneProgZ/sale-system-backend/domain/service"
 	"github.com/gorilla/mux"
 )
 
@@ -25,22 +27,27 @@ type ControllerImpl struct {
 }
 
 func (controller *ControllerImpl) CreateProduct(writer http.ResponseWriter, httpRequest *http.Request) {
-	var request web_request.CreateProductRequest
+	var createProductRequest request.CreateProductRequest
 
-	request, err := ValidateCreateRequest(httpRequest.Body, writer)
+	createProductRequest, err := v.ValidateCreateRequest(httpRequest.Body, writer)
 	if err != nil {
 		return
 	}
-	log.Println(fmt.Printf("Creating product %+v", request))
+	log.Println(fmt.Printf("Creating product %+v", createProductRequest))
 
-	product, err := controller.Service.CreateProduct(request.ToDomain())
+	product, err := controller.Service.CreateProduct(request.CreateRequestToDomain(createProductRequest))
 
 	if err != nil {
 		handler(err, writer)
 		return
 	}
 
-	setResponse(writer, http.StatusCreated, []header{contentType, AccessControlAllowHeaders, AccessControlAllowOrigin, AccessControlAllowMethods}, product.ToResponse())
+	response.SetResponse(writer, http.StatusCreated, []consts.Header{
+		consts.ContentType,
+		consts.AccessControlAllowHeaders,
+		consts.AccessControlAllowOrigin,
+		consts.AccessControlAllowMethods},
+		response.DomainToResponse(product))
 }
 
 func (controller *ControllerImpl) FindAllProducts(writer http.ResponseWriter, httpRequest *http.Request) {
@@ -51,7 +58,11 @@ func (controller *ControllerImpl) FindAllProducts(writer http.ResponseWriter, ht
 		return
 	}
 
-	setResponse(writer, http.StatusOK, []header{contentType, AccessControlAllowHeaders, AccessControlAllowOrigin}, domain.ProductsDomainToProductsResponse(products))
+	response.SetResponse(writer, http.StatusOK, []consts.Header{
+		consts.ContentType,
+		consts.AccessControlAllowHeaders,
+		consts.AccessControlAllowOrigin},
+		response.ProductsDomainToProductsResponse(products))
 }
 
 func (controller *ControllerImpl) FindProductByCode(writer http.ResponseWriter, httpRequest *http.Request) {
@@ -59,21 +70,21 @@ func (controller *ControllerImpl) FindProductByCode(writer http.ResponseWriter, 
 	numberOfBits := 64
 	numberBase := 10
 
-	code, err := strconv.ParseInt(vars["code"], numberBase, numberOfBits)	
+	code, err := strconv.ParseInt(vars["code"], numberBase, numberOfBits)
 	if err != nil {
 		handler(err, writer)
 		return
 	}
-	
+
 	log.Println(fmt.Printf("Creating product %d", code))
-	
+
 	product, err := controller.Service.FindProductByCode(code)
 	if err != nil {
 		handler(err, writer)
 		return
 	}
 
-	setResponse(writer, http.StatusOK, []header{contentType, AccessControlAllowHeaders, AccessControlAllowOrigin}, product.ToResponse())
+	response.SetResponse(writer, http.StatusOK, []consts.Header{consts.ContentType, consts.AccessControlAllowHeaders, consts.AccessControlAllowOrigin}, response.DomainToResponse(product))
 }
 
 func (controller *ControllerImpl) ChangeProductByCode(writer http.ResponseWriter, httpRequest *http.Request) {
@@ -89,17 +100,17 @@ func (controller *ControllerImpl) ChangeProductByCode(writer http.ResponseWriter
 		handler(err, writer)
 		return
 	}
-	request, err := ValidateUpdateRequest(httpRequest.Body, writer)
+	updateRequest, err := v.ValidateUpdateRequest(httpRequest.Body, writer)
 	if err != nil {
 		return
 	}
-	err = controller.Service.ChangeProductByCode(code, request.ToDomain())
+	err = controller.Service.ChangeProductByCode(code, request.UpdateRequestToDomain(updateRequest))
 	if err != nil {
 		handler(err, writer)
 	}
-	setResponse(writer, http.StatusOK, []header{contentType, AccessControlAllowHeaders, AccessControlAllowOrigin}, nil)
+	response.SetResponse(writer, http.StatusOK, []consts.Header{consts.ContentType, consts.AccessControlAllowHeaders, consts.AccessControlAllowOrigin}, nil)
 }
 
 func (controller *ControllerImpl) OptionsForBrowsers(writer http.ResponseWriter, httpRequest *http.Request) {
-	setResponse(writer, http.StatusOK, []header{contentType, AccessControlAllowHeaders, AccessControlAllowOrigin}, nil)
+	response.SetResponse(writer, http.StatusOK, []consts.Header{consts.ContentType, consts.AccessControlAllowHeaders, consts.AccessControlAllowOrigin}, nil)
 }

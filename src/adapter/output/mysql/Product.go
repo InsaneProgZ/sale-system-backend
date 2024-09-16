@@ -1,24 +1,27 @@
-package repository
+package mysql
 
 import (
 	"database/sql"
+	"log"
 	"reflect"
-	"sale-system/model/domain"
 	"time"
+
+	"github.com/InsaneProgZ/sale-system-backend/domain/model"
 )
 
 type Database interface {
-	Save(product domain.Product) (int64, error)
-	FindAll() ([]domain.Product, error)
-	FindByCode(code int64) (domain.Product, error)
-	ChangeProductByCode(code int64, product domain.Product) error
+	Save(product model.Product) (int64, error)
+	FindAll() ([]model.Product, error)
+	FindByCode(code int64) (model.Product, error)
+	ChangeProductByCode(code int64, product model.Product) error
 }
 
 type MysqlDB struct {
 	Mysql *sql.DB
 }
 
-func (database *MysqlDB) Save(product domain.Product) (code int64, err error) {
+func (database *MysqlDB) Save(product model.Product) (code int64, err error) {
+	log.Default()
 	sql := `INSERT into products (code, name, price, brand, creation_date) values (null, ? , ?, ?, ?);`
 	queryResult, err := database.Mysql.Exec(
 		sql,
@@ -33,14 +36,14 @@ func (database *MysqlDB) Save(product domain.Product) (code int64, err error) {
 	return
 }
 
-func (database *MysqlDB) FindAll() (products []domain.Product, err error) {
+func (database *MysqlDB) FindAll() (products []model.Product, err error) {
 	queryResult, err := database.Mysql.Query("SELECT * from products")
 	if err != nil {
 		return
 	}
 
 	for queryResult.Next() {
-		product := domain.Product{}
+		product := model.Product{}
 
 		queryResult.Scan(&product.Code, &product.Name, &product.Price, &product.Brand, &product.Creation_date)
 		localTime := product.Creation_date.In(time.Local)
@@ -50,7 +53,7 @@ func (database *MysqlDB) FindAll() (products []domain.Product, err error) {
 	return
 }
 
-func (database *MysqlDB) FindByCode(id int64) (product domain.Product, err error) {
+func (database *MysqlDB) FindByCode(id int64) (product model.Product, err error) {
 	queryResult := database.Mysql.QueryRow("SELECT * from products where code=?", id)
 
 	err = queryResult.Scan(&product.Code, &product.Name, &product.Price, &product.Brand, &product.Creation_date)
@@ -62,7 +65,7 @@ func (database *MysqlDB) FindByCode(id int64) (product domain.Product, err error
 	return
 }
 
-func (database *MysqlDB) ChangeProductByCode(code int64, newProduct domain.Product) (err error) {
+func (database *MysqlDB) ChangeProductByCode(code int64, newProduct model.Product) (err error) {
 
 	_, err = database.FindByCode(code)
 
@@ -78,7 +81,7 @@ func (database *MysqlDB) ChangeProductByCode(code int64, newProduct domain.Produ
 	return
 }
 
-func createUpdateQuery(code int64, product domain.Product) (sql string, params []interface{}) {
+func createUpdateQuery(code int64, product model.Product) (sql string, params []interface{}) {
 	sql = `UPDATE products SET`
 
 	productType := reflect.TypeOf(product)
